@@ -58,7 +58,7 @@ interface Props {
 }
 
 export function PlayerPanel({ p, qpl, compact, shakeKey, onAnswer, picked }: Props) {
-  const th = PLAYER_THEMES[p.id];
+  const th = PLAYER_THEMES[p.id]!;
   const progress = ((p.level - 1) * qpl + (p.sub - 1) + (p.status === "finished" ? 1 : 0)) / (TOTAL_LEVELS * qpl);
 
   return (

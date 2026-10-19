@@ -54,6 +54,7 @@ function Game() {
       const t = setTimeout(() => setScreen("podium"), 1600);
       return () => clearTimeout(t);
     }
+    return undefined;
   }, [players, screen]);
 
   const update = (i: number, fn: (p: Player) => Player) => setPlayers((ps) => ps.map((p, j) => (j === i ? fn(p) : p)));
@@ -119,7 +120,7 @@ function Game() {
         {screen === "game" && (
           <div className={`h-full p-3 sm:p-4 grid gap-3 ${numPlayers === 1 ? "max-w-2xl mx-auto grid-cols-1" : numPlayers === 2 ? "grid-cols-1 md:grid-cols-2" : numPlayers === 3 ? "grid-cols-1 md:grid-cols-3" : "grid-cols-2 lg:grid-cols-4"}`}>
             {players.map((p, i) => (
-              <PlayerPanel key={i} p={p} qpl={qpl} compact={numPlayers >= 3} shakeKey={shake[i]} picked={picked[i]} onAnswer={(a) => answer(i, a)} />
+              <PlayerPanel key={i} p={p} qpl={qpl} compact={numPlayers >= 3} shakeKey={shake[i] ?? 0} picked={picked[i] ?? null} onAnswer={(a) => answer(i, a)} />
             ))}
           </div>
         )}
@@ -187,7 +188,7 @@ function Podium({ players, onAgain, onHome }: { players: Player[]; onAgain: () =
         <p className="text-muted-foreground font-bold mt-1">{anyWin ? "Selamat untuk para juara angka!" : "Nyawa habis. Ayo coba lagi, kamu pasti bisa!"}</p>
         <div className="mt-5 flex flex-col gap-2.5">
           {sorted.map((p, i) => {
-            const t = PLAYER_THEMES[p.id];
+            const t = PLAYER_THEMES[p.id]!;
             return (
               <div key={p.id} className={`tone-${t.tone} flex items-center gap-3 rounded-2xl border-2 border-tone bg-card px-4 py-3`}>
                 <span className="font-heading text-2xl font-bold w-8">{["🥇", "🥈", "🥉", "4"][i]}</span>

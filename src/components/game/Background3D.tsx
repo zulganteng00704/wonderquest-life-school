@@ -42,7 +42,7 @@ export default function Background3D({ count = 22 }: { count?: number }) {
     () =>
       Array.from({ length: count }).map((_, i) => ({
         kind: i % 4,
-        color: COLORS[i % COLORS.length],
+        color: COLORS[i % COLORS.length]!,
         pos: [(Math.random() - 0.5) * 22, (Math.random() - 0.5) * 12, -Math.random() * 10 - 2] as [number, number, number],
         speed: 1 + Math.random() * 1.5,
       })),
