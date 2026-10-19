@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
-import { MAX_LIVES, PLAYER_THEMES, TOTAL_LEVELS, applyWrong, generateQuestion, newPlayer, type Player } from "@/game/logic";
+import { DIFFICULTIES, MAX_LIVES, PLAYER_THEMES, TOTAL_QUESTIONS, applyWrong, questionFor, newPlayer, type Difficulty, type Player } from "@/game/logic";
+import { AVATARS } from "@/components/game/avatars";
+import logo from "@/assets/logo.png";
 import { sound } from "@/game/sound";
 import { PlayerPanel } from "@/components/game/PlayerPanel";
 
@@ -27,7 +29,7 @@ type Screen = "home" | "game" | "podium";
 function Game() {
   const [screen, setScreen] = useState<Screen>("home");
   const [numPlayers, setNumPlayers] = useState(1);
-  const [qpl, setQpl] = useState(1);
+  const [diff, setDiff] = useState<Difficulty>("mudah");
   const [players, setPlayers] = useState<Player[]>([]);
   const [shake, setShake] = useState<number[]>([0, 0, 0, 0]);
   const [picked, setPicked] = useState<(string | null)[]>([null, null, null, null]);
@@ -39,7 +41,7 @@ function Game() {
   const start = (n: number) => {
     sound.click();
     setNumPlayers(n);
-    setPlayers(Array.from({ length: n }, (_, i) => newPlayer(i)));
+    setPlayers(Array.from({ length: n }, (_, i) => newPlayer(i, diff)));
     setShake([0, 0, 0, 0]);
     setPicked([null, null, null, null]);
     startRef.current = Date.now();
@@ -74,8 +76,7 @@ function Game() {
         setPick(i, null);
         update(i, (p) => {
           const base = { ...p, feedback: null, locked: false };
-          if (p.sub < qpl) return { ...base, sub: p.sub + 1, q: generateQuestion(p.level) };
-          if (p.level < TOTAL_LEVELS) return { ...base, level: p.level + 1, sub: 1, q: generateQuestion(p.level + 1) };
+          if (p.qNum < TOTAL_QUESTIONS) return { ...base, qNum: p.qNum + 1, q: questionFor(p.difficulty, p.qNum + 1) };
           rankRef.current += 1;
           const rank = rankRef.current;
           sound.finish();
@@ -101,7 +102,7 @@ function Game() {
 
       <header className="relative z-10 h-14 px-3 sm:px-5 flex items-center justify-between glass !rounded-none !border-x-0 !border-t-0">
         <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-xl bg-primary text-primary-foreground grid place-items-center font-heading font-bold btn-3d">100</div>
+          <img src={logo} alt="Logo Petualangan Nilai Tempat" width={44} height={44} className="w-11 h-11 object-contain" />
           <h1 className="font-heading font-bold text-base sm:text-xl">Petualangan Nilai Tempat</h1>
         </div>
         <div className="flex items-center gap-2">
@@ -116,11 +117,11 @@ function Game() {
       </header>
 
       <main className="relative z-10 flex-1 min-h-0 overflow-hidden">
-        {screen === "home" && <Home qpl={qpl} setQpl={setQpl} onStart={start} />}
+        {screen === "home" && <Home diff={diff} setDiff={setDiff} onStart={start} />}
         {screen === "game" && (
           <div className={`h-full p-3 sm:p-4 grid gap-3 ${numPlayers === 1 ? "max-w-2xl mx-auto grid-cols-1" : numPlayers === 2 ? "grid-cols-1 md:grid-cols-2" : numPlayers === 3 ? "grid-cols-1 md:grid-cols-3" : "grid-cols-2 lg:grid-cols-4"}`}>
             {players.map((p, i) => (
-              <PlayerPanel key={i} p={p} qpl={qpl} compact={numPlayers >= 3} shakeKey={shake[i] ?? 0} picked={picked[i] ?? null} onAnswer={(a) => answer(i, a)} />
+              <PlayerPanel key={i} p={p} compact={numPlayers >= 3} shakeKey={shake[i] ?? 0} picked={picked[i] ?? null} onAnswer={(a) => answer(i, a)} />
             ))}
           </div>
         )}
@@ -134,14 +135,15 @@ function Game() {
   );
 }
 
-function Home({ qpl, setQpl, onStart }: { qpl: number; setQpl: (n: number) => void; onStart: (n: number) => void }) {
+function Home({ diff, setDiff, onStart }: { diff: Difficulty; setDiff: (d: Difficulty) => void; onStart: (n: number) => void }) {
   return (
     <div className="h-full overflow-y-auto grid place-items-center p-4">
       <div className="glass rounded-[2rem] max-w-4xl w-full p-5 sm:p-8 text-center anim-pop">
-        <span className="inline-block px-4 py-1 rounded-full bg-accent text-accent-foreground font-bold text-xs sm:text-sm">✨ Game Edukasi 3D · 1–4 Pemain ✨</span>
-        <h2 className="font-heading text-3xl sm:text-5xl font-bold mt-3">Juara Angka 100</h2>
+        <span className="inline-block px-4 py-1 rounded-full bg-accent text-accent-foreground font-bold text-xs sm:text-sm">✨ Game Edukasi 3D · 1–3 Pemain ✨</span>
+        <h2 className="sr-only">Juara Angka 100</h2>
+        <img src={logo} alt="Petualangan Nilai Tempat – Juara Angka 100" width={600} height={600} className="mx-auto mt-2 h-40 sm:h-52 w-auto object-contain anim-bob" />
         <p className="text-muted-foreground font-semibold max-w-xl mx-auto mt-2 text-sm sm:text-base">
-          Kenali <b>Puluhan</b> dan <b>Satuan</b> dengan balok 3D! Selesaikan 10 level. Setiap pemain punya <b>{MAX_LIVES} nyawa ❤️</b> — salah jawab mengurangi nyawa, dan saat nyawa habis permainan langsung berhenti.
+          Kenali <b>Puluhan</b> dan <b>Satuan</b> dengan balok 3D! Pilih tingkat kesulitan, lalu jawab 10 soal. Setiap pemain punya <b>{MAX_LIVES} nyawa ❤️</b> — salah jawab mengurangi nyawa, dan saat nyawa habis permainan langsung berhenti.
         </p>
 
         <div className="relative mx-auto mt-4 h-44 sm:h-52 max-w-lg rounded-3xl bg-secondary/60">
@@ -152,17 +154,20 @@ function Home({ qpl, setQpl, onStart }: { qpl: number; setQpl: (n: number) => vo
           </div>
         </div>
 
-        <div className="mt-5 flex items-center justify-center gap-2 text-sm font-bold">
-          <span className="text-muted-foreground">Soal per level:</span>
-          {[1, 2, 3].map((n) => (
-            <button key={n} onClick={() => setQpl(n)} className={`btn-3d rounded-xl w-10 h-9 ${qpl === n ? "bg-primary text-primary-foreground" : "option-btn"}`}>{n}</button>
+        <h3 className="font-heading font-bold text-lg mt-5">1. Pilih tingkat kesulitan</h3>
+        <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          {DIFFICULTIES.map((d) => (
+            <button key={d.id} onClick={() => setDiff(d.id)} className={`btn-3d rounded-2xl p-3 text-left ${diff === d.id ? "bg-primary text-primary-foreground" : "option-btn"}`}>
+              <div className="font-heading font-bold text-lg">{d.emoji} {d.label}</div>
+              <div className={`text-xs font-semibold ${diff === d.id ? "" : "text-muted-foreground"}`}>{d.desc} · 10 soal</div>
+            </button>
           ))}
         </div>
-
-        <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {PLAYER_THEMES.map((t, i) => (
+        <h3 className="font-heading font-bold text-lg mt-5">2. Pilih jumlah pemain</h3>
+        <div className="mt-2 grid grid-cols-3 gap-3">
+          {PLAYER_THEMES.slice(0, 3).map((t, i) => (
             <button key={i} onClick={() => onStart(i + 1)} className={`tone-${t.tone} btn-3d bg-tone rounded-2xl p-4 font-heading font-bold`}>
-              <div className="text-3xl mb-1 tracking-tighter">{PLAYER_THEMES.slice(0, i + 1).map((x) => x.mascot).join("")}</div>
+              <div className="flex justify-center -space-x-3 mb-1">{AVATARS.slice(0, i + 1).map((a, k) => <img key={k} src={a} alt="" width={40} height={40} className="w-10 h-10 rounded-full bg-card border-2 border-card object-cover" />)}</div>
               <div className="text-lg">{i + 1} Pemain</div>
             </button>
           ))}
@@ -177,7 +182,7 @@ function Podium({ players, onAgain, onHome }: { players: Player[]; onAgain: () =
     if (a.status === "finished" && b.status !== "finished") return -1;
     if (b.status === "finished" && a.status !== "finished") return 1;
     if (a.status === "finished") return (a.rank ?? 9) - (b.rank ?? 9);
-    return b.level - a.level || b.score - a.score;
+    return b.qNum - a.qNum || b.score - a.score;
   });
   const anyWin = players.some((p) => p.status === "finished");
   return (
@@ -192,11 +197,11 @@ function Podium({ players, onAgain, onHome }: { players: Player[]; onAgain: () =
             return (
               <div key={p.id} className={`tone-${t.tone} flex items-center gap-3 rounded-2xl border-2 border-tone bg-card px-4 py-3`}>
                 <span className="font-heading text-2xl font-bold w-8">{["🥇", "🥈", "🥉", "4"][i]}</span>
-                <span className="text-3xl">{t.mascot}</span>
+                <img src={AVATARS[p.id]} alt="" width={40} height={40} className="w-10 h-10 rounded-full bg-secondary object-cover" />
                 <div className="flex-1 text-left">
                   <div className="font-heading font-bold">{t.name}</div>
                   <div className="text-xs text-muted-foreground font-bold">
-                    {p.status === "finished" ? `Tamat · ${p.timeSec} detik` : `Nyawa habis di Level ${p.level}`} · {p.correct} benar
+                    {p.status === "finished" ? `Tamat · ${p.timeSec} detik` : `Nyawa habis di soal ${p.qNum}`} · {p.correct} benar
                   </div>
                 </div>
                 <div className="font-heading font-bold text-xl text-tone">⭐ {p.score}</div>
