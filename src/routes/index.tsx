@@ -139,7 +139,7 @@ function Home({ diff, setDiff, onStart }: { diff: Difficulty; setDiff: (d: Diffi
   return (
     <div className="h-full overflow-y-auto grid place-items-center p-4">
       <div className="glass rounded-[2rem] max-w-4xl w-full p-5 sm:p-8 text-center anim-pop">
-        <span className="inline-block px-4 py-1 rounded-full bg-accent text-accent-foreground font-bold text-xs sm:text-sm">✨ Game Edukasi 3D · 1–4 Pemain ✨</span>
+        <span className="inline-block px-4 py-1 rounded-full bg-accent text-accent-foreground font-bold text-xs sm:text-sm">✨ Game Edukasi 3D · 1–3 Pemain ✨</span>
         <h2 className="sr-only">Juara Angka 100</h2>
         <img src={logo} alt="Petualangan Nilai Tempat – Juara Angka 100" width={600} height={600} className="mx-auto mt-2 h-40 sm:h-52 w-auto object-contain anim-bob" />
         <p className="text-muted-foreground font-semibold max-w-xl mx-auto mt-2 text-sm sm:text-base">
@@ -164,8 +164,8 @@ function Home({ diff, setDiff, onStart }: { diff: Difficulty; setDiff: (d: Diffi
           ))}
         </div>
         <h3 className="font-heading font-bold text-lg mt-5">2. Pilih jumlah pemain</h3>
-        <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {PLAYER_THEMES.map((t, i) => (
+        <div className="mt-2 grid grid-cols-3 gap-3">
+          {PLAYER_THEMES.slice(0, 3).map((t, i) => (
             <button key={i} onClick={() => onStart(i + 1)} className={`tone-${t.tone} btn-3d bg-tone rounded-2xl p-4 font-heading font-bold`}>
               <div className="flex justify-center -space-x-3 mb-1">{AVATARS.slice(0, i + 1).map((a, k) => <img key={k} src={a} alt="" width={40} height={40} className="w-10 h-10 rounded-full bg-card border-2 border-card object-cover" />)}</div>
               <div className="text-lg">{i + 1} Pemain</div>
