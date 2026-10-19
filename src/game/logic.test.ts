@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { applyWrong, newPlayer, MAX_LIVES } from "./logic";
 describe("lives", () => {
-  it("starts with 3 lives", () => expect(newPlayer(0).lives).toBe(3));
+  it("starts with 5 lives", () => expect(newPlayer(0).lives).toBe(5));
   it("stops the game when lives reach zero", () => {
     let p = newPlayer(0);
     for (let i = 0; i < MAX_LIVES; i++) p = applyWrong(p);
