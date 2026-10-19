@@ -11,7 +11,7 @@ export interface Question {
   hint: string;
 }
 
-export const MAX_LIVES = 3;
+export const MAX_LIVES = 5;
 export const TOTAL_QUESTIONS = 10;
 
 export type Difficulty = "mudah" | "sedang" | "sulit" | "sangat-sulit";
