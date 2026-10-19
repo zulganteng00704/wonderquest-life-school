@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { DIFFICULTIES, MAX_LIVES, PLAYER_THEMES, TOTAL_QUESTIONS, applyWrong, questionFor, newPlayer, type Difficulty, type Player } from "@/game/logic";
 import { AVATARS } from "@/components/game/avatars";
-import logo from "@/assets/logo.jpg.asset.json";
+import logo from "@/assets/logo.png";
 import { sound } from "@/game/sound";
 import { PlayerPanel } from "@/components/game/PlayerPanel";
 
@@ -102,7 +102,7 @@ function Game() {
 
       <header className="relative z-10 h-14 px-3 sm:px-5 flex items-center justify-between glass !rounded-none !border-x-0 !border-t-0">
         <div className="flex items-center gap-2">
-          <img src={logo.url} alt="Logo" width={40} height={40} className="w-10 h-10 rounded-xl object-cover" />
+          <img src={logo} alt="Logo Petualangan Nilai Tempat" width={44} height={44} className="w-11 h-11 object-contain" />
           <h1 className="font-heading font-bold text-base sm:text-xl">Petualangan Nilai Tempat</h1>
         </div>
         <div className="flex items-center gap-2">
@@ -140,7 +140,8 @@ function Home({ diff, setDiff, onStart }: { diff: Difficulty; setDiff: (d: Diffi
     <div className="h-full overflow-y-auto grid place-items-center p-4">
       <div className="glass rounded-[2rem] max-w-4xl w-full p-5 sm:p-8 text-center anim-pop">
         <span className="inline-block px-4 py-1 rounded-full bg-accent text-accent-foreground font-bold text-xs sm:text-sm">✨ Game Edukasi 3D · 1–4 Pemain ✨</span>
-        <h2 className="font-heading text-3xl sm:text-5xl font-bold mt-3">Juara Angka 100</h2>
+        <h2 className="sr-only">Juara Angka 100</h2>
+        <img src={logo} alt="Petualangan Nilai Tempat – Juara Angka 100" width={600} height={600} className="mx-auto mt-2 h-40 sm:h-52 w-auto object-contain anim-bob" />
         <p className="text-muted-foreground font-semibold max-w-xl mx-auto mt-2 text-sm sm:text-base">
           Kenali <b>Puluhan</b> dan <b>Satuan</b> dengan balok 3D! Pilih tingkat kesulitan, lalu jawab 10 soal. Setiap pemain punya <b>{MAX_LIVES} nyawa ❤️</b> — salah jawab mengurangi nyawa, dan saat nyawa habis permainan langsung berhenti.
         </p>
