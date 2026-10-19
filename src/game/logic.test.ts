@@ -11,3 +11,8 @@ describe("lives", () => {
   });
   it("keeps playing with lives left", () => expect(applyWrong(newPlayer(0)).status).toBe("playing"));
 });
+import { DIFFICULTIES, TOTAL_QUESTIONS } from "./logic";
+describe("difficulty", () => {
+  it("has four levels", () => expect(DIFFICULTIES.map((d) => d.label)).toEqual(["Mudah", "Sedang", "Sulit", "Sangat Sulit"]));
+  it("has 10 questions", () => expect(TOTAL_QUESTIONS).toBe(10));
+});
