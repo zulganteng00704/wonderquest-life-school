@@ -12,7 +12,20 @@ export interface Question {
 }
 
 export const MAX_LIVES = 3;
-export const TOTAL_LEVELS = 10;
+export const TOTAL_QUESTIONS = 10;
+
+export type Difficulty = "mudah" | "sedang" | "sulit" | "sangat-sulit";
+/** Each difficulty draws its 10 questions from these question types (see generateQuestion). */
+export const DIFFICULTIES: { id: Difficulty; label: string; emoji: string; desc: string; types: number[] }[] = [
+  { id: "mudah", label: "Mudah", emoji: "🌱", desc: "Balok 3D & mengenal puluhan-satuan", types: [1, 2, 4] },
+  { id: "sedang", label: "Sedang", emoji: "🌤️", desc: "Balok besar, nilai angka, menyusun", types: [3, 5, 7] },
+  { id: "sulit", label: "Sulit", emoji: "🔥", desc: "Menguraikan & bentuk panjang", types: [6, 8, 5] },
+  { id: "sangat-sulit", label: "Sangat Sulit", emoji: "🏆", desc: "Teka-teki jebakan & angka 100", types: [9, 10, 8, 6] },
+];
+export function questionFor(diff: Difficulty, n: number): Question {
+  const types = DIFFICULTIES.find((d) => d.id === diff)!.types;
+  return generateQuestion(types[(n - 1) % types.length]!);
+}
 
 export const LEVEL_TITLES: Record<number, string> = {
   1: "Balok Visual (11-20)",
@@ -28,10 +41,10 @@ export const LEVEL_TITLES: Record<number, string> = {
 };
 
 export const PLAYER_THEMES = [
-  { name: "Pemain 1", mascot: "🦊", mascotName: "Rubah Biru", tone: "p1", color: "#38bdf8" },
-  { name: "Pemain 2", mascot: "🐯", mascotName: "Macan Oranye", tone: "p2", color: "#fb7185" },
-  { name: "Pemain 3", mascot: "🐸", mascotName: "Katak Hijau", tone: "p3", color: "#34d399" },
-  { name: "Pemain 4", mascot: "🦄", mascotName: "Poni Ungu", tone: "p4", color: "#c084fc" },
+  { name: "Pemain 1", tone: "p1" },
+  { name: "Pemain 2", tone: "p2" },
+  { name: "Pemain 3", tone: "p3" },
+  { name: "Pemain 4", tone: "p4" },
 ] as const;
 
 export const randInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -204,8 +217,8 @@ export function generateQuestion(level: number): Question {
 
 export interface Player {
   id: number;
-  level: number;
-  sub: number;
+  qNum: number;
+  difficulty: Difficulty;
   score: number;
   lives: number;
   correct: number;
@@ -218,10 +231,10 @@ export interface Player {
   locked: boolean;
 }
 
-export function newPlayer(id: number): Player {
+export function newPlayer(id: number, difficulty: Difficulty = "mudah"): Player {
   return {
-    id, level: 1, sub: 1, score: 0, lives: MAX_LIVES, correct: 0, streak: 0,
-    q: generateQuestion(1), status: "playing", rank: null, timeSec: null, feedback: null, locked: false,
+    id, qNum: 1, difficulty, score: 0, lives: MAX_LIVES, correct: 0, streak: 0,
+    q: questionFor(difficulty, 1), status: "playing", rank: null, timeSec: null, feedback: null, locked: false,
   };
 }
 
