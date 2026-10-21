@@ -15,7 +15,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Petualangan Nilai Tempat: Juara Angka 100" },
-      { name: "description", content: "Game edukasi 3D interaktif belajar nilai tempat puluhan dan satuan hingga 100, untuk 1–4 pemain." },
+      { name: "description", content: "Game edukasi 3D interaktif belajar nilai tempat puluhan dan satuan hingga 100, untuk 1–3 pemain." },
       { property: "og:title", content: "Petualangan Nilai Tempat: Juara Angka 100" },
       { property: "og:description", content: "Belajar puluhan & satuan dengan balok 3D, nyawa, dan podium juara." },
       { property: "og:type", content: "website" },
