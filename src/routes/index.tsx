@@ -5,6 +5,7 @@ import { AVATARS } from "@/components/game/avatars";
 import logo from "@/assets/logo.png";
 import { sound } from "@/game/sound";
 import { PlayerPanel } from "@/components/game/PlayerPanel";
+import { LoginScreen, type Student } from "@/components/game/LoginScreen";
 
 const Background3D = lazy(() => import("@/components/game/Background3D"));
 const Dienes3D = lazy(() => import("@/components/game/Dienes3D"));
@@ -14,7 +15,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Petualangan Nilai Tempat: Juara Angka 100" },
-      { name: "description", content: "Game edukasi 3D interaktif belajar nilai tempat puluhan dan satuan hingga 100, untuk 1–4 pemain." },
+      { name: "description", content: "Game edukasi 3D interaktif belajar nilai tempat puluhan dan satuan hingga 100, untuk 1–3 pemain." },
       { property: "og:title", content: "Petualangan Nilai Tempat: Juara Angka 100" },
       { property: "og:description", content: "Belajar puluhan & satuan dengan balok 3D, nyawa, dan podium juara." },
       { property: "og:type", content: "website" },
@@ -24,10 +25,11 @@ export const Route = createFileRoute("/")({
   component: Game,
 });
 
-type Screen = "home" | "game" | "podium";
+type Screen = "login" | "home" | "game" | "podium";
 
 function Game() {
-  const [screen, setScreen] = useState<Screen>("home");
+  const [screen, setScreen] = useState<Screen>("login");
+  const [student, setStudent] = useState<Student | null>(null);
   const [numPlayers, setNumPlayers] = useState(1);
   const [diff, setDiff] = useState<Difficulty>("mudah");
   const [players, setPlayers] = useState<Player[]>([]);
@@ -100,23 +102,34 @@ function Game() {
         <Suspense fallback={null}><Background3D count={screen === "game" ? 12 : 24} /></Suspense>
       </div>
 
-      <header className="relative z-10 h-14 px-3 sm:px-5 flex items-center justify-between glass !rounded-none !border-x-0 !border-t-0">
-        <div className="flex items-center gap-2">
-          <img src={logo} alt="Logo Petualangan Nilai Tempat" width={44} height={44} className="w-11 h-11 object-contain" />
-          <h1 className="font-heading font-bold text-base sm:text-xl">Petualangan Nilai Tempat</h1>
+      <header className="relative z-10 h-14 px-3 sm:px-5 flex items-center justify-between gap-2 glass !rounded-none !border-x-0 !border-t-0">
+        <div className="flex items-center gap-2 min-w-0">
+          <img src={logo} alt="Logo Petualangan Nilai Tempat" width={44} height={44} className="w-11 h-11 object-contain shrink-0" />
+          {student ? (
+            <div className="min-w-0 leading-tight">
+              <div className="font-heading font-bold text-sm sm:text-base truncate">👋 {student.name}</div>
+              <div className="text-[11px] sm:text-xs font-bold text-muted-foreground truncate">🏫 {student.school}</div>
+            </div>
+          ) : (
+            <h1 className="font-heading font-bold text-base sm:text-xl truncate">Petualangan Nilai Tempat</h1>
+          )}
         </div>
-        <div className="flex items-center gap-2">
-          {screen !== "home" && (
+        <div className="flex items-center gap-2 shrink-0">
+          {(screen === "game" || screen === "podium") && (
             <>
               <button onClick={() => { sound.click(); setScreen("home"); }} className="btn-3d option-btn rounded-xl px-3 py-1.5 text-sm font-bold">🏠 <span className="hidden sm:inline">Menu</span></button>
               <button onClick={() => start(numPlayers)} className="btn-3d option-btn rounded-xl px-3 py-1.5 text-sm font-bold">🔄 <span className="hidden sm:inline">Ulangi</span></button>
             </>
+          )}
+          {screen === "home" && (
+            <button onClick={() => { sound.click(); setStudent(null); setScreen("login"); }} className="btn-3d option-btn rounded-xl px-3 py-1.5 text-sm font-bold">🚪 <span className="hidden sm:inline">Keluar</span></button>
           )}
           <button onClick={toggleMute} className="btn-3d option-btn rounded-xl w-10 h-9 text-base">{muted ? "🔇" : "🔊"}</button>
         </div>
       </header>
 
       <main className="relative z-10 flex-1 min-h-0 overflow-hidden">
+        {screen === "login" && <LoginScreen onLogin={(s) => { sound.click(); setStudent(s); setScreen("home"); }} />}
         {screen === "home" && <Home diff={diff} setDiff={setDiff} onStart={start} />}
         {screen === "game" && (
           <div className={`h-full p-3 sm:p-4 grid gap-3 ${numPlayers === 1 ? "max-w-2xl mx-auto grid-cols-1" : numPlayers === 2 ? "grid-cols-1 md:grid-cols-2" : numPlayers === 3 ? "grid-cols-1 md:grid-cols-3" : "grid-cols-2 lg:grid-cols-4"}`}>
